@@ -17,10 +17,10 @@ accounts = _.map database, ({password, sentry, secret, games}, name) ->
 restartBoost = ->
   console.log '\n---- Restarting accounts ----\n'
   Promise.map accounts, _.method 'restartGames'
-  .delay 200
+  .delay 400
   .finally restartBoost
 
 console.log '\n---- Starting to boost ----\n'
 Promise.map accounts, _.method 'boost'
-.delay 200
+.delay 400
 .then restartBoost
