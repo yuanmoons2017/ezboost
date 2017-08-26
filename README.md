@@ -3,13 +3,12 @@
 # ezboost
 # ezboost
 # ezboost
-DONT USE THIS CODE
+Only use this by tutorial from finalhacks.
 # ezboost
 # ezboost
 # ezboost
 # ezboost
 # ezboost
-GET FROM https://github.com/frk1
 # ezboost
 # ezboost
 # ezboost
