@@ -94,7 +94,7 @@
         </button>
         <button class="btn-primary" id="btn-add-account">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          Add Account
+          Add Game
         </button>
       </div>
     </div>
@@ -112,82 +112,218 @@
           <path d="M64 28C68 28 72 32 72 36C72 40 68 44 64 44" stroke="var(--copper)" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
         </svg>
       </div>
-      <h3 class="empty-title">No accounts brewing</h3>
-      <p class="empty-text">Add your first Steam account to start idling games and accumulating hours.</p>
-      <button class="btn-primary" onclick="document.getElementById('btn-add-account').click()">Add Your First Account</button>
+      <h3 class="empty-title">No games brewing</h3>
+      <p class="empty-text">Add your first game to start boosting hours. Just pick a game and sign in with Steam.</p>
+      <button class="btn-primary" onclick="document.getElementById('btn-add-account').click()">Add Your First Game</button>
     </div>
 
-    <!-- Add Account Modal -->
+    <!-- Add Game Modal -->
     <div class="modal-backdrop" id="modal-backdrop">
       <div class="modal" id="add-account-modal">
         <div class="modal-header">
-          <h2 class="modal-title">Add Steam Account</h2>
+          <h2 class="modal-title">Add Game</h2>
           <button class="modal-close" id="modal-close" aria-label="Close">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </div>
         <form class="modal-form" id="add-account-form">
-          <div class="form-group">
-            <label class="form-label" for="steam-username">Steam Username</label>
-            <input class="form-input" type="text" id="steam-username" placeholder="Enter your Steam login name" required autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="steam-password">Password</label>
-            <input class="form-input" type="password" id="steam-password" placeholder="Account password" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="steam-secret">2FA Shared Secret <span class="form-hint">(optional)</span></label>
-            <input class="form-input" type="text" id="steam-secret" placeholder="Your two-factor shared secret" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Games to Idle</label>
-            <div class="game-chips" id="game-chips">
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="730"> <span>CS2</span>
-              </label>
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="570"> <span>Dota 2</span>
-              </label>
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="440"> <span>TF2</span>
-              </label>
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="252490"> <span>Rust</span>
-              </label>
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="1172470"> <span>Apex</span>
-              </label>
-              <label class="game-chip">
-                <input type="checkbox" name="games" value="578080"> <span>PUBG</span>
-              </label>
+          <!-- Step indicators -->
+          <div class="modal-steps">
+            <div class="modal-step active" data-step="1">
+              <span class="step-number">1</span>
+              <span class="step-label">Select Game</span>
             </div>
-            <div class="form-row">
-              <input class="form-input form-input--small" type="number" id="custom-game-id" placeholder="Custom App ID" min="1">
-              <button type="button" class="btn-secondary btn-small" id="add-custom-game">Add</button>
+            <div class="step-connector"></div>
+            <div class="modal-step" data-step="2">
+              <span class="step-number">2</span>
+              <span class="step-label">Sign In</span>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Auth Type</label>
-            <div class="auth-toggle">
-              <label class="auth-option">
-                <input type="radio" name="auth-type" value="email" checked>
-                <span class="auth-option-inner">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="3" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 5l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Email Guard
-                </span>
-              </label>
-              <label class="auth-option">
-                <input type="radio" name="auth-type" value="2fa">
-                <span class="auth-option-inner">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="1" width="12" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="12" r="1" fill="currentColor"/><line x1="6" y1="4" x2="12" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  Mobile 2FA
-                </span>
-              </label>
+
+          <!-- Step 1: Game Setup -->
+          <div class="form-step" id="step-game-setup">
+            <div class="form-group">
+              <label class="form-label">Choose a Game</label>
+              <div class="game-chips" id="game-chips">
+                <label class="game-chip">
+                  <input type="radio" name="game" value="730"> <span>CS2</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="570"> <span>Dota 2</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="440"> <span>TF2</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="252490"> <span>Rust</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="1172470"> <span>Apex Legends</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="578080"> <span>PUBG</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="1245620"> <span>Elden Ring</span>
+                </label>
+                <label class="game-chip">
+                  <input type="radio" name="game" value="892970"> <span>Valheim</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="custom-game-id">Or Enter App ID</label>
+              <div class="form-row">
+                <input class="form-input form-input--small" type="number" id="custom-game-id" placeholder="Steam App ID (e.g. 730)" min="1">
+                <button type="button" class="btn-secondary btn-small" id="add-custom-game">Set</button>
+              </div>
+              <p class="form-helper">Find the App ID on the game's Steam store page URL</p>
+            </div>
+            <div class="selected-game-preview" id="selected-game-preview" style="display:none;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6.5 11.5L2.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="selected-game-name">No game selected</span>
+              <span class="selected-game-id" id="selected-game-appid"></span>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="modal-cancel">Cancel</button>
+              <button type="button" class="btn-primary" id="btn-next-step" disabled>
+                Continue to Sign In
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
             </div>
           </div>
-          <div class="form-actions">
-            <button type="button" class="btn-secondary" id="modal-cancel">Cancel</button>
-            <button type="submit" class="btn-primary">Add Account</button>
+
+          <!-- Step 2: Steam QR Sign In -->
+          <div class="form-step" id="step-steam-signin" style="display:none;">
+            <div class="qr-signin-section">
+              <div class="qr-header">
+                <svg class="qr-steam-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="13" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="11" cy="12" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="18" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7.5 15.5L11 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <div>
+                  <h3 class="qr-title">Sign in with Steam</h3>
+                  <p class="qr-subtitle">Scan with your phone to authenticate</p>
+                </div>
+              </div>
+              <div class="qr-code-container" id="qr-code-container">
+                <div class="qr-code-placeholder" id="qr-code-placeholder">
+                  <svg class="qr-pattern" width="180" height="180" viewBox="0 0 180 180" fill="none">
+                    <!-- QR code visual pattern -->
+                    <rect x="10" y="10" width="40" height="40" rx="4" stroke="currentColor" stroke-width="3"/>
+                    <rect x="18" y="18" width="24" height="24" rx="2" fill="currentColor"/>
+                    <rect x="130" y="10" width="40" height="40" rx="4" stroke="currentColor" stroke-width="3"/>
+                    <rect x="138" y="18" width="24" height="24" rx="2" fill="currentColor"/>
+                    <rect x="10" y="130" width="40" height="40" rx="4" stroke="currentColor" stroke-width="3"/>
+                    <rect x="18" y="138" width="24" height="24" rx="2" fill="currentColor"/>
+                    <!-- Data pattern blocks -->
+                    <rect x="60" y="14" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="72" y="14" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="84" y="14" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="96" y="14" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="108" y="14" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="60" y="26" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="84" y="26" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="108" y="26" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="72" y="38" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="96" y="38" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <!-- Middle rows -->
+                    <rect x="14" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="26" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="38" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="60" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="72" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="84" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="96" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="108" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="130" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="142" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="154" y="60" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <!-- More data blocks -->
+                    <rect x="14" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="38" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="60" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="84" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="96" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="120" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="142" y="72" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="14" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="26" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="60" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="72" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="96" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="108" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="130" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="154" y="84" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <!-- Bottom rows -->
+                    <rect x="14" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="38" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="60" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="84" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="108" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="130" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="154" y="96" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="60" y="108" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="72" y="108" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="96" y="108" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="120" y="108" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="142" y="108" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <!-- Bottom area -->
+                    <rect x="60" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="72" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="84" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="96" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="108" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="130" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="142" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="154" y="130" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="60" y="142" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="84" y="142" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="108" y="142" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                    <rect x="130" y="142" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="154" y="142" width="8" height="8" rx="1" fill="currentColor" opacity="0.4"/>
+                    <rect x="72" y="154" width="8" height="8" rx="1" fill="currentColor" opacity="0.6"/>
+                    <rect x="96" y="154" width="8" height="8" rx="1" fill="currentColor" opacity="0.8"/>
+                    <rect x="120" y="154" width="8" height="8" rx="1" fill="currentColor" opacity="0.5"/>
+                    <rect x="142" y="154" width="8" height="8" rx="1" fill="currentColor" opacity="0.7"/>
+                  </svg>
+                  <div class="qr-loading-overlay" id="qr-loading">
+                    <div class="qr-spinner"></div>
+                    <span>Generating QR code...</span>
+                  </div>
+                </div>
+              </div>
+              <div class="qr-instructions">
+                <div class="qr-step-item">
+                  <span class="qr-step-num">1</span>
+                  <span>Open the <strong>Steam app</strong> on your phone</span>
+                </div>
+                <div class="qr-step-item">
+                  <span class="qr-step-num">2</span>
+                  <span>Tap the <strong>guard icon</strong> or scan option</span>
+                </div>
+                <div class="qr-step-item">
+                  <span class="qr-step-num">3</span>
+                  <span>Point your camera at this QR code</span>
+                </div>
+              </div>
+              <div class="qr-status" id="qr-status">
+                <span class="status-dot status-dot--warning"></span>
+                <span>Waiting for scan...</span>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-secondary" id="btn-back-step">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Back
+              </button>
+              <button type="submit" class="btn-primary" id="btn-add-game">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5L6.5 11.5L2.5 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Add Game
+              </button>
+            </div>
           </div>
         </form>
       </div>

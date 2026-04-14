@@ -119,7 +119,7 @@
   // --- Render a single account card ---
   function renderCard(acc) {
     const statusDotClass = acc.status === 'online' ? 'status-dot--active' : 'status-dot--inactive';
-    const authIcon = acc.authType === 'email' ? icons.email : icons.phone;
+    const authIcon = acc.authType === 'email' ? icons.email : acc.authType === 'qr' ? icons.phone : icons.phone;
     const gamesPercent = Math.min((acc.games.length / acc.maxGames) * 100, 100);
 
     return `
@@ -193,18 +193,81 @@
   });
 
   // --- Modal open/close ---
+  var selectedGameId = null;
+  var selectedGameName = null;
+
+  var gameNames = {
+    730: 'CS2', 570: 'Dota 2', 440: 'TF2', 252490: 'Rust',
+    1172470: 'Apex Legends', 578080: 'PUBG', 1245620: 'Elden Ring', 892970: 'Valheim'
+  };
+
   function openModal() {
+    selectedGameId = null;
+    selectedGameName = null;
+    showStep(1);
     modalBackdrop.classList.add('active');
     document.body.style.overflow = 'hidden';
-    setTimeout(function () {
-      document.getElementById('steam-username').focus();
-    }, 300);
   }
   function closeModal() {
     modalBackdrop.classList.remove('active');
     document.body.style.overflow = '';
     form.reset();
+    selectedGameId = null;
+    selectedGameName = null;
+    document.getElementById('selected-game-preview').style.display = 'none';
+    document.getElementById('btn-next-step').disabled = true;
   }
+
+  function showStep(step) {
+    var step1 = document.getElementById('step-game-setup');
+    var step2 = document.getElementById('step-steam-signin');
+    var stepIndicators = document.querySelectorAll('.modal-step');
+
+    if (step === 1) {
+      step1.style.display = '';
+      step2.style.display = 'none';
+      stepIndicators[0].classList.add('active');
+      stepIndicators[1].classList.remove('active');
+    } else {
+      step1.style.display = 'none';
+      step2.style.display = '';
+      stepIndicators[0].classList.add('active', 'completed');
+      stepIndicators[1].classList.add('active');
+      simulateQrLoading();
+    }
+  }
+
+  function selectGame(appId, name) {
+    selectedGameId = appId;
+    selectedGameName = name;
+    var preview = document.getElementById('selected-game-preview');
+    document.getElementById('selected-game-name').textContent = name;
+    document.getElementById('selected-game-appid').textContent = 'App ID: ' + appId;
+    preview.style.display = 'flex';
+    document.getElementById('btn-next-step').disabled = false;
+  }
+
+  function simulateQrLoading() {
+    var loading = document.getElementById('qr-loading');
+    var status = document.getElementById('qr-status');
+    loading.style.display = 'flex';
+    status.innerHTML = '<span class="status-dot status-dot--warning"></span><span>Generating QR code...</span>';
+
+    setTimeout(function () {
+      loading.style.display = 'none';
+      status.innerHTML = '<span class="status-dot status-dot--active"></span><span>QR code ready — scan with Steam app</span>';
+    }, 1500);
+  }
+
+  // Game chip radio selection
+  var gameChips = document.querySelectorAll('#game-chips input[name="game"]');
+  gameChips.forEach(function (chip) {
+    chip.addEventListener('change', function () {
+      var appId = parseInt(this.value, 10);
+      var name = gameNames[appId] || 'App ' + appId;
+      selectGame(appId, name);
+    });
+  });
 
   document.getElementById('btn-add-account').addEventListener('click', function () {
     if (accounts.length >= MAX_ACCOUNTS) {
@@ -222,36 +285,39 @@
     if (e.key === 'Escape' && modalBackdrop.classList.contains('active')) closeModal();
   });
 
-  // --- Form submission ---
+  // Step navigation
+  document.getElementById('btn-next-step').addEventListener('click', function () {
+    if (!selectedGameId) return;
+    showStep(2);
+  });
+  document.getElementById('btn-back-step').addEventListener('click', function () {
+    showStep(1);
+  });
+
+  // --- Form submission (Add Game) ---
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var username = document.getElementById('steam-username').value.trim();
-    if (!username) return;
-
-    var checkedGames = Array.from(form.querySelectorAll('input[name="games"]:checked')).map(function (el) {
-      return parseInt(el.value, 10);
-    });
-    var authType = form.querySelector('input[name="auth-type"]:checked').value;
+    if (!selectedGameId) return;
 
     var newAccount = {
       id: 'a' + Date.now(),
-      username: username,
-      authType: authType,
-      status: 'offline',
+      username: selectedGameName,
+      authType: 'qr',
+      status: 'online',
       uptimeHours: 0,
       uptimeMins: 0,
       uptimeSecs: 0,
       timeGainedHours: 0,
       timeGainedMins: 0,
       timeGainedSecs: 0,
-      games: checkedGames,
+      games: [selectedGameId],
       maxGames: 32
     };
 
     accounts.push(newAccount);
     closeModal();
     renderAccounts();
-    showToast('Account "' + username + '" added', 'success');
+    showToast('Game "' + selectedGameName + '" added for boosting', 'success');
   });
 
   // --- Custom game ID ---
@@ -260,18 +326,12 @@
     var val = parseInt(input.value, 10);
     if (!val || val < 1) return;
 
-    var chipsContainer = document.getElementById('game-chips');
-    var existing = chipsContainer.querySelector('input[value="' + val + '"]');
-    if (existing) {
-      existing.checked = true;
-      input.value = '';
-      return;
-    }
+    // Uncheck any previously selected radio
+    var radios = document.querySelectorAll('#game-chips input[name="game"]');
+    radios.forEach(function (r) { r.checked = false; });
 
-    var label = document.createElement('label');
-    label.className = 'game-chip';
-    label.innerHTML = '<input type="checkbox" name="games" value="' + val + '" checked> <span>App ' + val + '</span>';
-    chipsContainer.appendChild(label);
+    var name = gameNames[val] || 'App ' + val;
+    selectGame(val, name);
     input.value = '';
   });
 
